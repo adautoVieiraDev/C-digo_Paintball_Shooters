@@ -1,0 +1,78 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <unistd.h>
+
+using namespace std;
+
+bool returnButtonTrue(int x, int y, int msPosX, int msPosY, int a, int b) {                           //Função para retornar se um botão foi clicado ou não!
+        if(msPosX >= x && msPosX <= (x+a) && msPosY >= y && msPosY <= (y+b)) 
+                return 1;
+        else
+                return 0;         
+}
+
+int main(){
+    int numTela = 1;                                                                                    //  Cria a variável que contém o número da tela atual
+    int *tela = &numTela;                                                                               //  Cria um ponteiro que aponta para a variável acima
+
+    sf::RenderWindow Window;                                                                            //  Cria o objeto Window
+    Window.create(sf::VideoMode(800, 600), "Paintball Shooters", sf::Style::Fullscreen);                //  Cria a janela de tamanho 800 por 600 e com o título     
+    Window.setKeyRepeatEnabled(false);
+
+    sf::RectangleShape fundoPreto(sf::Vector2f(800,600));                                               //  Cria um objeto fundoPreto do tamanho da tela
+    fundoPreto.setFillColor(sf::Color(255, 0, 0, 0));                                                   //  Seta a cor preta no fundoPreto com opacidade 100%
+
+    sf::Texture bgTexture;                                                                              //  Define a textura do background do menu
+    sf::Texture btn_newgTexture;                                                                        //  Define a textura do botão New game
+    sf::Texture groundPBArenaTexture;                                                                   //  Define a texture do chão da arena de PB
+    sf::Sprite bgIMG;                                                                                   //  Cria o sprite do background do menu
+    sf::Sprite btn_newg;                                                                                //  Cria o sprite do botão New game
+    sf::Sprite groundPBArena;                                                                           //  Cria o sprite do chão da arena de PB
+ 
+    
+    if(!bgTexture.loadFromFile("bgmenu.png") ||                                                         //  Testa se as texturas estão sendo carregadas de fato
+       !btn_newgTexture.loadFromFile("btn_newg.png") || 
+       !groundPBArenaTexture.loadFromFile("groundPBArena.png")
+       )
+            cout << "Error! Uma das imagens não pôde ser carregada!" << endl;                           //e exibe uma mensagem de erro caso não estejam
+
+    bgIMG.setTexture(bgTexture);                                                                        //  Aponta o Sprite do background do menu pra textura do mesmo
+    btn_newg.setTexture(btn_newgTexture);                                                               //  Aponta o Sprite do botão New game pra textura do mesmo
+    btn_newg.setPosition(300,200);                                                                      //  Seta a posição do botão
+    groundPBArena.setTexture(groundPBArenaTexture);                                                     //  Aponta o Sprite do do chão da arena de PB pra textura do mesmo
+
+    Window.clear();                                                                                     //  Limpa tudo que está na tela
+    Window.draw(bgIMG);                                                                                 //  Desenha o background do menu
+    Window.draw(btn_newg);                                                                              //  Desenha o botão New game
+    Window.display();                                                                                   //  Joga na tela tudo que foi desenhado acima
+    
+    while (Window.isOpen()){                                                                            //  Todos os comandos dentro deste while só poderão ser executado                                                                                                   //se a janela estiver em foco
+        sf::Event Event;                                                                                //  Cria o objeto event
+        while (Window.pollEvent(Event)){                                                                //  Este while será chamado sempre que um evento acontecer
+            if (Event.type == sf::Event::KeyPressed || Event.type == sf::Event::Closed){                //  Se o evento close for true ou se uma tecla foi clicada
+                if (Event.key.code == sf::Keyboard::Escape){                                            //  E essa tecla foi o Esc
+                Window.close();                                                                         //  Feche a janela
+                }
+            }
+
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(Window);                                //  Cria o objeto mousePosition e seta o valor dele com as coordenadas
+            //                                                                                          //atuais do mouse
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){                                           //  Se o evento "botão esquerdo do mouse clicado" for true,
+                if(*tela==1 && returnButtonTrue(300, 200, mousePosition.x, mousePosition.y, 200, 100)){ //se a tela na hora do clique for a tela 1 e se o clique foi no botão 
+                    cout << "Deu certo!" << endl;                                                       //começa o processo de mudar a tela
+                    *tela = 3;                                                                          //  Seta o valor da tela atual pra 3
+                    Window.clear();                                                                     //  Limpa tudo que está na tela
+                    Window.draw(groundPBArena);                                                         //  Desenha o chão da PB Arena
+                    Window.display();                                                                   //  Joga na tela tudo que foi desenhado acima
+                }
+                else
+                    cout << "Não deu certo!" << endl;
+            }
+        }
+        
+        
+    }   
+ 
+
+    return 0;
+}
